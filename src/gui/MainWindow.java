@@ -83,8 +83,13 @@ public class MainWindow extends JFrame {
         clearButton.setMnemonic(KeyEvent.VK_E);
         clearButton.addActionListener(e -> resultsArea.setText(""));
 
+        JButton quitButton = new JButton(Messages.get("button.quit"));
+        quitButton.setMnemonic(KeyEvent.VK_Q);
+        quitButton.addActionListener(e -> System.exit(0));
+
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
         south.add(clearButton);
+        south.add(quitButton);
 
         // ── Assemblage ────────────────────────────────────────────────────────
         setLayout(new BorderLayout(4, 4));
