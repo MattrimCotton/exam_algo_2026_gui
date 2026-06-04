@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(javac *)",
+      "Bash(java *)",
+      "Bash(git status)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(build.bat)",
+      "Bash(test.bat)",
+      "Bash(.\\build.bat)",
+      "Bash(.\\test.bat)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep"
+    ]
+  }
+}
