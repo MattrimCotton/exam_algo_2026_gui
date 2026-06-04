@@ -6,6 +6,9 @@ import java.util.Random;
 
 public class DiceRoller {
 
+    /** Faces disponibles, dans l'ordre d'affichage. */
+    public static final int[] AVAILABLE_FACES = {4, 6, 8, 10, 12, 20, 100};
+
     private static final Random rng = new Random();
 
     public static RollResult roll(int faces, int count, int bonus) {
