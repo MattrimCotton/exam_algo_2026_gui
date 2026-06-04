@@ -8,36 +8,47 @@ import java.text.MessageFormat;
 /** Formate un {@link RollResult} en texte lisible pour la zone de résultats. */
 public class ResultFormatter {
 
-    private static final String SEPARATOR = "─".repeat(36);
+    private static final String SEPARATEUR = "─".repeat(36);
 
-    public static String format(RollResult result) {
-        StringBuilder sb = new StringBuilder();
+    /**
+     * Produit le bloc de texte affiché après chaque lancer.
+     *
+     * @param resultat le résultat à afficher
+     * @return le texte formaté, terminé par un séparateur
+     */
+    public static String formater(RollResult resultat) {
+        StringBuilder texte = new StringBuilder();
 
-        sb.append(MessageFormat.format(
-                Messages.get("result.intro"), result.rolls().size(), result.faces()))
-          .append("\n");
+        // Titre : "Lancement de N dF :"
+        texte.append(MessageFormat.format(
+                Messages.lire("result.intro"), resultat.valeurs().size(), resultat.faces()))
+             .append("\n");
 
-        for (int i = 0; i < result.rolls().size(); i++) {
-            sb.append(MessageFormat.format(
-                    Messages.get("result.die"), i + 1, result.rolls().get(i)))
-              .append("\n");
+        // Détail de chaque dé
+        for (int i = 0; i < resultat.valeurs().size(); i++) {
+            texte.append(MessageFormat.format(
+                    Messages.lire("result.die"), i + 1, resultat.valeurs().get(i)))
+                 .append("\n");
         }
 
-        sb.append(MessageFormat.format(Messages.get("result.subtotal"), result.subtotal()))
-          .append("\n");
+        // Sous-totale (sans bonus)
+        texte.append(MessageFormat.format(Messages.lire("result.subtotal"), resultat.sousTotale()))
+             .append("\n");
 
-        if (result.bonus() != 0) {
-            String sign = result.bonus() > 0 ? "+" : "";
-            sb.append(MessageFormat.format(
-                    Messages.get("result.bonus"), sign + result.bonus()))
-              .append("\n");
+        // Bonus ou malus, affiché seulement s'il est non nul
+        if (resultat.bonus() != 0) {
+            String signe = resultat.bonus() > 0 ? "+" : "";
+            texte.append(MessageFormat.format(
+                    Messages.lire("result.bonus"), signe + resultat.bonus()))
+                 .append("\n");
         }
 
-        sb.append(MessageFormat.format(Messages.get("result.total"), result.total()))
-          .append("\n")
-          .append(SEPARATOR)
-          .append("\n");
+        // Total final
+        texte.append(MessageFormat.format(Messages.lire("result.total"), resultat.total()))
+             .append("\n")
+             .append(SEPARATEUR)
+             .append("\n");
 
-        return sb.toString();
+        return texte.toString();
     }
 }

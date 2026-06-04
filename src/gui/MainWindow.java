@@ -8,147 +8,167 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 
+/** Fenêtre principale de l'application — gère la mise en page et les interactions. */
 public class MainWindow extends JFrame {
 
-    private final JComboBox<String> dieBox;
-    private final JSpinner countSpinner;
-    private final JSpinner bonusSpinner;
-    private final JTextArea resultsArea;
+    // ── Champs partagés entre les panneaux ────────────────────────────────────
+    private final JComboBox<String> selecteurDe;
+    private final JSpinner          spinnerNombre;
+    private final JSpinner          spinnerBonus;
+    private final JTextArea         zoneResultats;
 
     public MainWindow() {
-        super(Messages.get("title"));
+        super(Messages.lire("title"));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(520, 400));
 
-        // ── Champs partagés entre les panneaux ────────────────────────────────
-        String[] dieNames = new String[DiceRoller.AVAILABLE_FACES.length];
-        for (int i = 0; i < DiceRoller.AVAILABLE_FACES.length; i++) {
-            dieNames[i] = "d" + DiceRoller.AVAILABLE_FACES[i];
+        // Sélecteur de type de dé : construit à partir du modèle
+        String[] nomsDes = new String[DiceRoller.FACES_DISPONIBLES.length];
+        for (int i = 0; i < DiceRoller.FACES_DISPONIBLES.length; i++) {
+            nomsDes[i] = "d" + DiceRoller.FACES_DISPONIBLES[i];
         }
-        dieBox = new JComboBox<>(dieNames);
-        dieBox.setSelectedIndex(1); // d6 par défaut
-        dieBox.getAccessibleContext().setAccessibleName(Messages.get("accessible.die"));
+        selecteurDe = new JComboBox<>(nomsDes);
+        selecteurDe.setSelectedIndex(1); // d6 par défaut
+        selecteurDe.getAccessibleContext().setAccessibleName(Messages.lire("accessible.die"));
 
-        countSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        setSpinnerAccessibleName(countSpinner, Messages.get("accessible.count"));
-        setSpinnerWidth(countSpinner, 55);
+        // Spinner : nombre de dés (1 à 100)
+        spinnerNombre = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+        nommerSpinner(spinnerNombre, Messages.lire("accessible.count"));
+        largeurSpinner(spinnerNombre, 55);
 
-        bonusSpinner = new JSpinner(new SpinnerNumberModel(0, -999, 999, 1));
-        setSpinnerAccessibleName(bonusSpinner, Messages.get("accessible.bonus"));
-        setSpinnerWidth(bonusSpinner, 65);
+        // Spinner : bonus / malus (-999 à 999)
+        spinnerBonus = new JSpinner(new SpinnerNumberModel(0, -999, 999, 1));
+        nommerSpinner(spinnerBonus, Messages.lire("accessible.bonus"));
+        largeurSpinner(spinnerBonus, 65);
 
-        resultsArea = new JTextArea(14, 42);
-        resultsArea.setEditable(false);
-        resultsArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
-        resultsArea.getAccessibleContext().setAccessibleName(Messages.get("accessible.results"));
+        // Zone d'affichage des résultats (lecture seule)
+        zoneResultats = new JTextArea(14, 42);
+        zoneResultats.setEditable(false);
+        zoneResultats.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+        zoneResultats.getAccessibleContext().setAccessibleName(Messages.lire("accessible.results"));
 
-        // ── Assemblage ────────────────────────────────────────────────────────
-        JButton rollButton = new JButton(Messages.get("button.roll"));
-        rollButton.setMnemonic(KeyEvent.VK_L);
-        rollButton.getAccessibleContext().setAccessibleDescription(Messages.get("accessible.roll"));
-        rollButton.addActionListener(e -> roll());
+        // Bouton Lancer : déclenche un lancer de dés
+        JButton boutonLancer = new JButton(Messages.lire("button.roll"));
+        boutonLancer.setMnemonic(KeyEvent.VK_L);
+        boutonLancer.getAccessibleContext().setAccessibleDescription(Messages.lire("accessible.roll"));
+        boutonLancer.addActionListener(e -> lancer());
 
+        // Assemblage des trois zones de la fenêtre
         setLayout(new BorderLayout(4, 4));
-        add(buildControlsPanel(rollButton), BorderLayout.NORTH);
-        add(buildResultsPanel(),            BorderLayout.CENTER);
-        add(buildSouthPanel(),              BorderLayout.SOUTH);
+        add(construirePanneauControles(boutonLancer), BorderLayout.NORTH);
+        add(construirePanneauResultats(),              BorderLayout.CENTER);
+        add(construirePanneauBas(),                    BorderLayout.SOUTH);
 
-        getRootPane().setDefaultButton(rollButton);
+        // La touche Entrée déclenche le lancer depuis n'importe quel champ
+        getRootPane().setDefaultButton(boutonLancer);
+
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
-        rollButton.requestFocusInWindow();
+        boutonLancer.requestFocusInWindow();
     }
 
     // ── Construction des panneaux ─────────────────────────────────────────────
 
-    private JPanel buildControlsPanel(JButton rollButton) {
-        JLabel dieLabel = new JLabel(Messages.get("label.die"));
-        dieLabel.setDisplayedMnemonic(KeyEvent.VK_T);
-        dieLabel.setLabelFor(dieBox);
+    /** Panneau haut : sélecteur de dé, spinners, bouton Lancer. */
+    private JPanel construirePanneauControles(JButton boutonLancer) {
+        JLabel etiquetteDe = new JLabel(Messages.lire("label.die"));
+        etiquetteDe.setDisplayedMnemonic(KeyEvent.VK_T);
+        etiquetteDe.setLabelFor(selecteurDe);
 
-        JLabel countLabel = new JLabel(Messages.get("label.count"));
-        countLabel.setDisplayedMnemonic(KeyEvent.VK_N);
-        countLabel.setLabelFor(spinnerField(countSpinner));
+        JLabel etiquetteNombre = new JLabel(Messages.lire("label.count"));
+        etiquetteNombre.setDisplayedMnemonic(KeyEvent.VK_N);
+        etiquetteNombre.setLabelFor(champSpinner(spinnerNombre));
 
-        JLabel bonusLabel = new JLabel(Messages.get("label.bonus"));
-        bonusLabel.setDisplayedMnemonic(KeyEvent.VK_B);
-        bonusLabel.setLabelFor(spinnerField(bonusSpinner));
+        JLabel etiquetteBonus = new JLabel(Messages.lire("label.bonus"));
+        etiquetteBonus.setDisplayedMnemonic(KeyEvent.VK_B);
+        etiquetteBonus.setLabelFor(champSpinner(spinnerBonus));
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 4, 8));
-        GridBagConstraints c = new GridBagConstraints();
-        c.insets  = new Insets(2, 6, 2, 6);
-        c.anchor  = GridBagConstraints.WEST;
+        JPanel panneau = new JPanel(new GridBagLayout());
+        panneau.setBorder(BorderFactory.createEmptyBorder(8, 8, 4, 8));
 
-        // Ligne 0 : labels
-        c.gridy = 0;
-        c.gridx = 0; panel.add(dieLabel,   c);
-        c.gridx = 1; panel.add(countLabel,  c);
-        c.gridx = 2; panel.add(bonusLabel,  c);
+        GridBagConstraints contrainte = new GridBagConstraints();
+        contrainte.insets = new Insets(2, 6, 2, 6);
+        contrainte.anchor = GridBagConstraints.WEST;
 
-        // Ligne 1 : champs + bouton Lancer
-        c.gridy = 1;
-        c.gridx = 0; panel.add(dieBox,        c);
-        c.gridx = 1; panel.add(countSpinner,   c);
-        c.gridx = 2; panel.add(bonusSpinner,   c);
-        c.gridx = 3; c.insets = new Insets(2, 14, 2, 6);
-                     panel.add(rollButton,     c);
+        // Ligne 0 : étiquettes
+        contrainte.gridy = 0;
+        contrainte.gridx = 0; panneau.add(etiquetteDe,     contrainte);
+        contrainte.gridx = 1; panneau.add(etiquetteNombre,  contrainte);
+        contrainte.gridx = 2; panneau.add(etiquetteBonus,   contrainte);
 
-        return panel;
+        // Ligne 1 : champs de saisie + bouton Lancer
+        contrainte.gridy = 1;
+        contrainte.gridx = 0; panneau.add(selecteurDe,    contrainte);
+        contrainte.gridx = 1; panneau.add(spinnerNombre,   contrainte);
+        contrainte.gridx = 2; panneau.add(spinnerBonus,    contrainte);
+        contrainte.gridx = 3; contrainte.insets = new Insets(2, 14, 2, 6);
+                              panneau.add(boutonLancer,   contrainte);
+
+        return panneau;
     }
 
-    private JScrollPane buildResultsPanel() {
-        JScrollPane scroll = new JScrollPane(resultsArea);
-        scroll.setBorder(BorderFactory.createTitledBorder(Messages.get("result.header")));
-        return scroll;
+    /** Panneau central : zone de résultats avec barre de défilement. */
+    private JScrollPane construirePanneauResultats() {
+        JScrollPane defilement = new JScrollPane(zoneResultats);
+        defilement.setBorder(BorderFactory.createTitledBorder(Messages.lire("result.header")));
+        return defilement;
     }
 
-    private JPanel buildSouthPanel() {
-        JButton clearButton = new JButton(Messages.get("button.clear"));
-        clearButton.setMnemonic(KeyEvent.VK_E);
-        clearButton.addActionListener(e -> resultsArea.setText(""));
+    /** Panneau bas : boutons Effacer et Quitter. */
+    private JPanel construirePanneauBas() {
+        JButton boutonEffacer = new JButton(Messages.lire("button.clear"));
+        boutonEffacer.setMnemonic(KeyEvent.VK_E);
+        boutonEffacer.addActionListener(e -> zoneResultats.setText(""));
 
-        JButton quitButton = new JButton(Messages.get("button.quit"));
-        quitButton.setMnemonic(KeyEvent.VK_Q);
-        quitButton.addActionListener(e ->
+        JButton boutonQuitter = new JButton(Messages.lire("button.quit"));
+        boutonQuitter.setMnemonic(KeyEvent.VK_Q);
+        boutonQuitter.addActionListener(e ->
                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)));
 
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
-        panel.add(clearButton);
-        panel.add(quitButton);
-        return panel;
+        JPanel panneau = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
+        panneau.add(boutonEffacer);
+        panneau.add(boutonQuitter);
+        return panneau;
     }
 
     // ── Actions ───────────────────────────────────────────────────────────────
 
-    private void roll() {
-        int faces = DiceRoller.AVAILABLE_FACES[dieBox.getSelectedIndex()];
-        int count = (int) countSpinner.getValue();
-        int bonus = (int) bonusSpinner.getValue();
+    /** Lit les valeurs saisies, lance les dés et affiche le résultat. */
+    private void lancer() {
+        int faces  = DiceRoller.FACES_DISPONIBLES[selecteurDe.getSelectedIndex()];
+        int nombre = (int) spinnerNombre.getValue();
+        int bonus  = (int) spinnerBonus.getValue();
 
-        String text = ResultFormatter.format(DiceRoller.roll(faces, count, bonus));
-        resultsArea.append(text);
-        resultsArea.setCaretPosition(resultsArea.getDocument().getLength());
+        String texte = ResultFormatter.formater(DiceRoller.lancer(faces, nombre, bonus));
+        zoneResultats.append(texte);
+        zoneResultats.setCaretPosition(zoneResultats.getDocument().getLength());
     }
 
     // ── Utilitaires accessibilité ─────────────────────────────────────────────
 
-    /** Retourne le JTextField interne du spinner — c'est lui que le lecteur d'écran voit. */
-    private static JTextField spinnerField(JSpinner spinner) {
+    /**
+     * Retourne le champ texte interne d'un spinner.
+     * C'est ce champ que le lecteur d'écran et la plage braille voient réellement.
+     */
+    private static JTextField champSpinner(JSpinner spinner) {
         return ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
     }
 
-    /** Propage le nom accessible sur le spinner ET sur son champ interne. */
-    private static void setSpinnerAccessibleName(JSpinner spinner, String name) {
-        spinner.getAccessibleContext().setAccessibleName(name);
-        spinnerField(spinner).getAccessibleContext().setAccessibleName(name);
+    /**
+     * Propage le nom accessible sur le spinner ET sur son champ interne,
+     * pour que les lecteurs d'écran annoncent le bon libellé.
+     */
+    private static void nommerSpinner(JSpinner spinner, String nom) {
+        spinner.getAccessibleContext().setAccessibleName(nom);
+        champSpinner(spinner).getAccessibleContext().setAccessibleName(nom);
     }
 
-    // ── Utilitaires layout ────────────────────────────────────────────────────
+    // ── Utilitaires mise en page ──────────────────────────────────────────────
 
-    private static void setSpinnerWidth(JSpinner spinner, int width) {
-        Dimension d = spinner.getPreferredSize();
-        spinner.setPreferredSize(new Dimension(width, d.height));
+    /** Fixe la largeur préférée d'un spinner en pixels. */
+    private static void largeurSpinner(JSpinner spinner, int largeur) {
+        Dimension taille = spinner.getPreferredSize();
+        spinner.setPreferredSize(new Dimension(largeur, taille.height));
     }
 }
