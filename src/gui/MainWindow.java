@@ -36,20 +36,20 @@ public class MainWindow extends JFrame {
         dieLabel.setLabelFor(dieBox);
 
         countSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        countSpinner.getAccessibleContext().setAccessibleName(Messages.get("accessible.count"));
+        setSpinnerAccessibleName(countSpinner, Messages.get("accessible.count"));
         setSpinnerWidth(countSpinner, 55);
 
         JLabel countLabel = new JLabel(Messages.get("label.count"));
         countLabel.setDisplayedMnemonic(KeyEvent.VK_N);
-        countLabel.setLabelFor(countSpinner);
+        countLabel.setLabelFor(spinnerField(countSpinner));
 
         bonusSpinner = new JSpinner(new SpinnerNumberModel(0, -999, 999, 1));
-        bonusSpinner.getAccessibleContext().setAccessibleName(Messages.get("accessible.bonus"));
+        setSpinnerAccessibleName(bonusSpinner, Messages.get("accessible.bonus"));
         setSpinnerWidth(bonusSpinner, 65);
 
         JLabel bonusLabel = new JLabel(Messages.get("label.bonus"));
         bonusLabel.setDisplayedMnemonic(KeyEvent.VK_B);
-        bonusLabel.setLabelFor(bonusSpinner);
+        bonusLabel.setLabelFor(spinnerField(bonusSpinner));
 
         JButton rollButton = new JButton(Messages.get("button.roll"));
         rollButton.setMnemonic(KeyEvent.VK_L);
@@ -141,5 +141,16 @@ public class MainWindow extends JFrame {
     private static void setSpinnerWidth(JSpinner spinner, int width) {
         Dimension d = spinner.getPreferredSize();
         spinner.setPreferredSize(new Dimension(width, d.height));
+    }
+
+    /** Retourne le JTextField interne du spinner — c'est lui que le lecteur d'écran voit. */
+    private static JTextField spinnerField(JSpinner spinner) {
+        return ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+    }
+
+    /** Propage le nom accessible sur le spinner ET sur son champ interne. */
+    private static void setSpinnerAccessibleName(JSpinner spinner, String name) {
+        spinner.getAccessibleContext().setAccessibleName(name);
+        spinnerField(spinner).getAccessibleContext().setAccessibleName(name);
     }
 }
