@@ -56,18 +56,26 @@ public class MainWindow extends JFrame {
         rollButton.getAccessibleContext().setAccessibleDescription(Messages.get("accessible.roll"));
         rollButton.addActionListener(e -> roll());
 
-        // ── Panneau de contrôles ───────────────────────────────────────────────
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        controls.add(dieLabel);
-        controls.add(dieBox);
-        controls.add(Box.createHorizontalStrut(4));
-        controls.add(countLabel);
-        controls.add(countSpinner);
-        controls.add(Box.createHorizontalStrut(4));
-        controls.add(bonusLabel);
-        controls.add(bonusSpinner);
-        controls.add(Box.createHorizontalStrut(8));
-        controls.add(rollButton);
+        // ── Panneau de contrôles (GridBagLayout : label au-dessus de chaque champ)
+        JPanel controls = new JPanel(new GridBagLayout());
+        controls.setBorder(BorderFactory.createEmptyBorder(8, 8, 4, 8));
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(2, 6, 2, 6);
+        c.anchor = GridBagConstraints.WEST;
+
+        // Ligne 0 : labels
+        c.gridy = 0;
+        c.gridx = 0; controls.add(dieLabel,   c);
+        c.gridx = 1; controls.add(countLabel,  c);
+        c.gridx = 2; controls.add(bonusLabel,  c);
+
+        // Ligne 1 : champs + bouton
+        c.gridy = 1;
+        c.gridx = 0; controls.add(dieBox,       c);
+        c.gridx = 1; controls.add(countSpinner,  c);
+        c.gridx = 2; controls.add(bonusSpinner,  c);
+        c.gridx = 3; c.insets = new Insets(2, 14, 2, 6);
+                     controls.add(rollButton,    c);
 
         // ── Zone de résultats ─────────────────────────────────────────────────
         resultsArea = new JTextArea(14, 42);
