@@ -2,6 +2,7 @@ package gui;
 
 import i18n.Messages;
 import model.DiceRoller;
+import model.ResultFormatter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,7 @@ public class MainWindow extends JFrame {
     private final JSpinner          spinnerNombre;
     private final JSpinner          spinnerBonus;
     private final JTextArea         zoneResultats;
+    private       int               compteurLancer = 0;
 
     public MainWindow() {
         super(Messages.lire("title"));
@@ -40,6 +42,11 @@ public class MainWindow extends JFrame {
         spinnerBonus = new JSpinner(new SpinnerNumberModel(0, -999, 999, 1));
         nommerSpinner(spinnerBonus, Messages.lire("accessible.bonus"));
         largeurSpinner(spinnerBonus, 65);
+        String infoBonus = Messages.lire("tooltip.bonus");
+        spinnerBonus.setToolTipText(infoBonus);
+        spinnerBonus.getAccessibleContext().setAccessibleDescription(infoBonus);
+        champSpinner(spinnerBonus).setToolTipText(infoBonus);
+        champSpinner(spinnerBonus).getAccessibleContext().setAccessibleDescription(infoBonus);
 
         // Zone d'affichage des résultats (lecture seule)
         zoneResultats = new JTextArea(14, 42);
@@ -65,7 +72,9 @@ public class MainWindow extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
-        boutonLancer.requestFocusInWindow();
+        // Différé pour que la fenêtre soit pleinement rendue avant le déplacement du focus,
+        // ce qui garantit que les lecteurs d'écran annoncent le bon composant.
+        SwingUtilities.invokeLater(selecteurDe::requestFocusInWindow);
     }
 
     // ── Construction des panneaux ─────────────────────────────────────────────
@@ -119,7 +128,7 @@ public class MainWindow extends JFrame {
     private JPanel construirePanneauBas() {
         JButton boutonEffacer = new JButton(Messages.lire("button.clear"));
         boutonEffacer.setMnemonic(KeyEvent.VK_E);
-        boutonEffacer.addActionListener(e -> zoneResultats.setText(""));
+        boutonEffacer.addActionListener(e -> { zoneResultats.setText(""); compteurLancer = 0; });
 
         JButton boutonQuitter = new JButton(Messages.lire("button.quit"));
         boutonQuitter.setMnemonic(KeyEvent.VK_Q);
@@ -140,7 +149,7 @@ public class MainWindow extends JFrame {
         int nombre = (int) spinnerNombre.getValue();
         int bonus  = (int) spinnerBonus.getValue();
 
-        String texte = ResultFormatter.formater(DiceRoller.lancer(faces, nombre, bonus));
+        String texte = ResultFormatter.formater(DiceRoller.lancer(faces, nombre, bonus), ++compteurLancer);
         zoneResultats.append(texte);
         zoneResultats.setCaretPosition(zoneResultats.getDocument().getLength());
     }

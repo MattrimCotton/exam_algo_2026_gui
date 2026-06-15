@@ -7,7 +7,14 @@ public class Messages {
 
     private static final ResourceBundle catalogue = ResourceBundle.getBundle("messages");
 
-    /** Retourne la chaîne associée à la {@code clé} dans le catalogue courant. */
+    private Messages() {}
+
+    /**
+     * Retourne la chaîne associée à la {@code clé} dans le catalogue courant.
+     *
+     * @param clé identifiant de la chaîne dans messages.properties
+     * @return la chaîne localisée
+     */
     public static String lire(String clé) {
         return catalogue.getString(clé);
     }
