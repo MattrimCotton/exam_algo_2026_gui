@@ -12,6 +12,8 @@ public class DiceRoller {
 
     private static final Random hasard = new Random();
 
+    private DiceRoller() {}
+
     /**
      * Lance {@code nombre} dés à {@code faces} faces et applique un {@code bonus}.
      *

@@ -11,13 +11,21 @@ import java.util.List;
  */
 public record RollResult(int faces, List<Integer> valeurs, int bonus) {
 
-    /** Somme des valeurs obtenues, sans le bonus. */
-    public int sousTotale() {
+    /**
+     * Somme des valeurs obtenues, sans le bonus.
+     *
+     * @return la somme brute des dés
+     */
+    public int sousTotal() {
         return valeurs.stream().mapToInt(Integer::intValue).sum();
     }
 
-    /** Total final : sous-totale + bonus. */
+    /**
+     * Total final : sousTotal() + bonus.
+     *
+     * @return le résultat définitif du lancer
+     */
     public int total() {
-        return sousTotale() + bonus;
+        return sousTotal() + bonus;
     }
 }
