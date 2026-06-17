@@ -15,4 +15,7 @@ del sources.txt
 :: Copier les fichiers de ressources i18n
 xcopy /s /q /y src\*.properties bin\ >nul 2>&1
 
-java -cp bin App
+:: Copier les fichiers audio
+xcopy /q /y src\audio\*.ogg bin\audio\ >nul 2>&1
+
+java -cp "bin;lib\*" App

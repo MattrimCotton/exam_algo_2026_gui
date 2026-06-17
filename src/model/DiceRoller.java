@@ -14,14 +14,7 @@ public class DiceRoller {
 
     private DiceRoller() {}
 
-    /**
-     * Lance {@code nombre} dés à {@code faces} faces et applique un {@code bonus}.
-     *
-     * @param faces  nombre de faces du dé (doit être > 0)
-     * @param nombre nombre de dés à lancer (doit être >= 1)
-     * @param bonus  bonus ou malus à ajouter au total (peut être négatif)
-     * @return le résultat complet du lancer
-     */
+    /** Lance {@code nombre} dés à {@code faces} faces et applique un {@code bonus}. */
     public static RollResult lancer(int faces, int nombre, int bonus) {
         List<Integer> valeurs = new ArrayList<>(nombre);
         for (int i = 0; i < nombre; i++) {

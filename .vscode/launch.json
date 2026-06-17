@@ -6,7 +6,7 @@
             "name": "Launch App",
             "request": "launch",
             "mainClass": "App",
-            "classPaths": ["${workspaceFolder}/bin"]
+            "classPaths": ["${workspaceFolder}/bin", "${workspaceFolder}/lib/*"]
         }
     ]
 }

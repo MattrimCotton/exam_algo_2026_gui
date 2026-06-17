@@ -1,9 +1,5 @@
 package model;
 
-import i18n.Messages;
-
-import java.text.MessageFormat;
-
 /** Formate un {@link RollResult} en texte lisible pour la zone de résultats. */
 public class ResultFormatter {
 
@@ -22,38 +18,22 @@ public class ResultFormatter {
     public static String formater(RollResult resultat, int numero) {
         StringBuilder texte = new StringBuilder();
 
-        // En-tête numéroté : "══ Lancer n°N ══════..."
         texte.append(entete(numero)).append("\n");
+        texte.append("Lancement de ").append(resultat.valeurs().size()).append(" d").append(resultat.faces()).append(" :\n");
 
-        // Titre : "Lancement de N dF :"
-        texte.append(MessageFormat.format(
-                Messages.lire("result.intro"), resultat.valeurs().size(), resultat.faces()))
-             .append("\n");
-
-        // Détail de chaque dé
-        String motifDe = Messages.lire("result.die");
         for (int i = 0; i < resultat.valeurs().size(); i++) {
-            texte.append(MessageFormat.format(motifDe, i + 1, resultat.valeurs().get(i)))
-                 .append("\n");
+            texte.append("  Dé ").append(i + 1).append(" : ").append(resultat.valeurs().get(i)).append("\n");
         }
 
-        // Sous-total (sans bonus)
-        texte.append(MessageFormat.format(Messages.lire("result.subtotal"), resultat.sousTotal()))
-             .append("\n");
+        texte.append("Sous-total : ").append(resultat.sousTotal()).append("\n");
 
-        // Bonus ou malus, affiché seulement s'il est non nul
         if (resultat.bonus() != 0) {
             String signe = resultat.bonus() > 0 ? "+" : "";
-            texte.append(MessageFormat.format(
-                    Messages.lire("result.bonus"), signe + resultat.bonus()))
-                 .append("\n");
+            texte.append("Bonus/Malus : ").append(signe).append(resultat.bonus()).append("\n");
         }
 
-        // Total final
-        texte.append(MessageFormat.format(Messages.lire("result.total"), resultat.total()))
-             .append("\n")
-             .append(SEPARATEUR)
-             .append("\n\n");
+        texte.append("Total final : ").append(resultat.total()).append("\n")
+             .append(SEPARATEUR).append("\n\n");
 
         return texte.toString();
     }
